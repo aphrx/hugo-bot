@@ -3,6 +3,9 @@ import openai
 from dotenv import load_dotenv
 from slack_bolt.adapter.socket_mode import SocketModeHandler
 from slack_bolt import App
+from database import create_connection
+
+
 
 load_dotenv()
 
@@ -21,16 +24,6 @@ def hello_command(ack, body):
 def event_test(say, body):
     question = str(body['event']['text'])
     messages.append({'role': 'user', 'content': question})
-    # response = openai.Completion.create(
-    #     model="text-davinci-003",
-    #     prompt=f"The following is a conversation with an AI assistant based on a dog. The assistant is helpful, creative, clever, and very friendly.\n\nHuman: {question}\nAI:",
-    #     temperature=0.9,
-    #     max_tokens=150,
-    #     top_p=1,
-    #     frequency_penalty=0.0,
-    #     presence_penalty=0.6,
-    #     stop=[" Human:", " AI:"]
-    #     ) 
     response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
         messages=messages
@@ -39,4 +32,5 @@ def event_test(say, body):
     say(str(response['choices'][0]['message']['content']))
 
 if __name__ == "__main__":
+    conn = create_connection('data.db')
     SocketModeHandler(app, os.environ["SLACK_APP_TOKEN"]).start()
