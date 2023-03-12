@@ -3,9 +3,9 @@ import openai
 from dotenv import load_dotenv
 from slack_bolt.adapter.socket_mode import SocketModeHandler
 from slack_bolt import App
-from database import create_connection
+from database import setup_db
 
-
+db = [{}]
 
 load_dotenv()
 
@@ -21,16 +21,18 @@ def hello_command(ack, body):
     ack(f"Hi, <@{user_id}>!")
 
 @app.event("app_mention")
-def event_test(say, body):
-    question = str(body['event']['text'])
+def event_test(say, event):
+    question = str(event['text'])
     messages.append({'role': 'user', 'content': question})
     response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
         messages=messages
         )
-    print(response)
+    # print(response)
     say(str(response['choices'][0]['message']['content']))
 
+
+
 if __name__ == "__main__":
-    conn = create_connection('data.db')
+    conn = setup_db()
     SocketModeHandler(app, os.environ["SLACK_APP_TOKEN"]).start()
