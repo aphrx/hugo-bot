@@ -12,7 +12,7 @@ load_dotenv()
 app = App(token=os.environ["SLACK_BOT_TOKEN"])
 openai.api_key = os.environ["OPENAI_API_KEY"]
 messages = [
-        {"role": "system", "content": "You are an AI assistant. You are an Australian Shepherd named Hugo who lives on Slack."}
+        {"role": "system", "content": "You are an Australian Shepherd named Hugo whose owner is Yves Mayotte."}
 ]
 
 @app.command("/say-hi")
@@ -28,8 +28,9 @@ def event_test(say, event):
         model="gpt-3.5-turbo",
         messages=messages
         )
-    # print(response)
-    say(str(response['choices'][0]['message']['content']))
+    resp = str(response['choices'][0]['message']['content'])
+    messages.append({'role': 'assistant', 'content': resp})
+    say(resp)
 
 
 
